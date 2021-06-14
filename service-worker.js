@@ -1,13 +1,26 @@
-self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim().then(() => {
-    // See https://developer.mozilla.org/en-US/docs/Web/API/Clients/matchAll
-    return self.clients.matchAll({type: 'window'});
-  }).then(clients => {
-    return clients.map(client => {
-      // Check to make sure WindowClient.navigate() is supported.
-      if ('navigate' in client) {
-        return client.navigate('activated.html');
-      }
-    });
-  }));
+function addToCache(request, networkResponse) {
+  return caches.open('web-bluetooth')
+    .then(cache => cache.put(request, networkResponse));
+}
+
+function getCacheResponse(request) {
+  return caches.open('web-bluetooth').then(cache => {
+    return cache.match(request);
+  });
+}
+
+function getNetworkOrCacheResponse(request) {
+  return fetch(request).then(networkResponse => {
+    addToCache(request, networkResponse.clone());
+    return networkResponse;
+  }).catch(_ => {
+    return getCacheResponse(request)
+      .then(cacheResponse => cacheResponse || Response.error());
+  });
+}
+
+self.addEventListener('fetch', event => {
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(getNetworkOrCacheResponse(event.request));
+  }
 });
