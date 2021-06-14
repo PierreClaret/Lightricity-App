@@ -25,7 +25,6 @@
     
     <body>
         <img class="Header" src="logo.jpeg">
-            <img class="pageIcon" src="feuille.png" width="10%">
                 <h1>Lightricity Web Application for scanning devices</h1>
                 
                 <script>
@@ -134,6 +133,7 @@
                         }
                     }
                 </script>
+                
                 <script>async function onButtonClick() {
                     let filters = [];
                     
@@ -168,8 +168,6 @@
                             log('Advertisement received.');
                             log('  Device Name: ' + event.device.name);
                             log('  Device ID: ' + event.device.id);
-                            log('  RSSI: ' + event.rssi);
-                            log('  TX Power: ' + event.txPower);
                             log('  UUIDs: ' + event.uuids);
                             event.manufacturerData.forEach((valueDataView, key) => {
                                 logDataView('Manufacturer', key, valueDataView);
